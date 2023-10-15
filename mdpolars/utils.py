@@ -51,7 +51,7 @@ def _convert(arraies):
     >>> _convert([])
     []
     >>> _convert([["foo", "bar"]])
-    [['foo'], ['bar']
+    [['foo'], ['bar']]
     >>> _convert([["hoge", "fuga"], ["foo", "bar"]])
     [['hoge', 'foo'], ['fuga', 'bar']]
     """
