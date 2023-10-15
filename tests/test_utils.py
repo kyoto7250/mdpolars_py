@@ -1,5 +1,6 @@
 import unittest
 
+import polars as pl
 from polars import read_csv
 from polars.testing import assert_frame_equal
 
@@ -145,6 +146,15 @@ class TestUtils(unittest.TestCase):
             df, read_csv("tests/fixtures/simple_pattern.csv", has_header=False)
         )
 
+        df = utils.from_md(
+            """
+            | Header    | Title       |
+            | Paragraph | Text        |
+            """,
+            schema=["Syntax", "Description"],
+        )
+        assert_frame_equal(df, read_csv("tests/fixtures/simple_pattern.csv"))
+
     def test_with_header_from_md(self):
         df = utils.from_md(
             """
@@ -156,3 +166,14 @@ class TestUtils(unittest.TestCase):
             schema=["Syntax", "Description"],
         )
         assert_frame_equal(df, read_csv("tests/fixtures/simple_pattern.csv"))
+
+        df = utils.from_md(
+            """
+            | id        | score       |
+            | --------- | ----------- |
+            | 1         | 100         |
+            | 2         | 80          |
+            """,
+            schema=[("id", pl.Int64), ("score", pl.Int64)],
+        )
+        assert_frame_equal(df, read_csv("tests/fixtures/numeric_pattern.csv"))

@@ -75,12 +75,13 @@ def from_md(table: str, schema=None):
     Returns:
         polars.DataFrame
     """
-    exist_schema = schema is not None
     rows = []
     for line in table.split("\n"):
         extracted, is_schema = _extract_line(line.strip(), len(rows) == 1)
         if is_schema:
-            exist_schema = True
+            if schema is None:
+                schema = rows[0]
+            rows.pop(0)
             continue
 
         if extracted == []:
@@ -88,18 +89,23 @@ def from_md(table: str, schema=None):
 
         rows.append(extracted)
 
-    if exist_schema:
-        if schema is None:
-            schema = rows[0]
-        rows = rows[1:]
+    dtypes = {}
+    if schema is not None:
+        for idx in range(len(schema)):
+            if isinstance(schema[0], tuple) and len(schema[idx]) >= 2:
+                dtypes[schema[idx][0]] = schema[idx][1]
+                schema[idx] = schema[idx][0]
 
     rows = _convert(rows)
 
     if schema is None:
         schema = [f"column_{i + 1}" for i in range(len(rows))]
-    df = DataFrame(rows, schema=schema)
 
+    df = DataFrame(rows, schema=schema)
     for column in df.columns:
+        if column in dtypes:
+            df = df.with_columns(col(column)).cast(dtypes[column], strict=True)
+            continue
         if len(df[column]) == 0:
             df = df.with_columns(col(column)).cast(Utf8, strict=True)
     return df
