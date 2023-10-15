@@ -42,7 +42,7 @@ print(df)
 
 ```python
 # the header can be overwritten if the header exists
-import mdpd
+import mdpolars
 df = mdpolars.from_md("""
 +------------+-------+
 | id         | score |
