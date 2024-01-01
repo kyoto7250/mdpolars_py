@@ -11,7 +11,7 @@ keywords = ["polars", "markdown", "table", "test", "development"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-polars = "^0.19.8"
+polars = ">=0.19.8,<0.21.0"
 
 
 [tool.poetry.group.dev.dependencies]
